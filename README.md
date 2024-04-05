@@ -1,40 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 위클리 미션 Data Fetching 방식을 리팩토링했습니다.
 
-## Getting Started
+1. getServerSideProps (SSR)
+2. getStaticPaths + getStaticProps (SSG)
 
-First, run the development server:
+## 코드 확인시 체크아웃하세요.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+git checkout main (원본)
+git checkout getServerSideProps (SSR)
+git checkout getStaticPath (SSG)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 리팩토링 한 지점
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+-   src/ui/Category.tsx
+-   pages/optional-catch/[[...folderId]].tsx
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### 상황
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+#### 기존
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+-   CSR을 이용 할 때에는 folder페이지에서 페이지 이동없이 클라이언트에서 데이터를 가져오는 방식을 사용했습니다.
 
-## Learn More
+#### 변경점
 
-To learn more about Next.js, take a look at the following resources:
+-   SSR 또는 SSG를 사용하기 위해 folder를 페이지별로 나누었습니다.
+-   멘토링에서도 말씀드렸지만 예시를 위해서 억지로 folder 페이지를 폴더 아이디별로 나누었습니다.
+-   아이디별로 페이지를 나누기 위해서 **Dynamic Route**를 사용했습니다.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 고민해볼 이슈
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### getStaticPaths + getStaticProps를 사용하는 경우
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+-   getStaticPaths를 사용하면 미리 정의된 경로에 대한 정적 페이지를 생성할 수 있습니다. (빌드시간)
+-   빌드 시간에 생성되지 못한 페이지는 404 페이지로 처리됩니다.
+-   런타임시간에 새로 생긴 폴더에 대한 페이지는 어떻게 처리되어야 할까요?
