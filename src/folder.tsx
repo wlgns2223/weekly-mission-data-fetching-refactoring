@@ -1,19 +1,76 @@
-import AddLink from "@/src/ui/AddLink";
-import Layout from "@/src/feature/Layout";
-import SearchBar from "@/src/ui/SearchBar";
-import { CardList } from "@/src/ui/CardList";
-import { Card } from "@/src/ui/Card";
-import { useGetLink } from "@/src/hooks/useGetLink";
-import { useGetFolderByLink } from "@/src/hooks/useGetFolderByLink";
-import Category from "@/src/ui/Category";
-import { EditLink } from "@/src/ui/EditLink";
-import Modal from "@/src/ui/Modal/Modal";
-
-import styles from "@/styles/pages/FolderPage.module.css";
-import { useState, useRef, useEffect, ChangeEventHandler, MouseEventHandler } from "react";
+import { NextPage } from "next";
+import { axiosInstance } from "./util/axiosInstance";
+import { ChangeEventHandler, MouseEventHandler, useEffect, useRef, useState } from "react";
+import { useGetLink } from "./hooks/useGetLink";
+import { useGetFolderByLink } from "./hooks/useGetFolderByLink";
 import Head from "next/head";
+import Modal from "./ui/Modal/Modal";
+import Layout from "./feature/Layout";
+import AddLink from "./ui/AddLink";
+import SearchBar from "./ui/SearchBar";
+import Category from "./ui/Category";
+import { EditLink } from "./ui/EditLink";
+import { CardList } from "./ui/CardList";
+import { Card } from "./ui/Card";
+import styles from "@/styles/pages/FolderPage.module.css";
+import { MappedLink } from "./util/mapFolderFromLink";
 
-const FolderPage: React.FC = () => {
+export type Folder = {
+    id: number;
+    created_at: string;
+    name: string;
+    user_id: number;
+    favorite: boolean;
+    link: {
+        count: number;
+    };
+};
+
+export type Link = {
+    id: number;
+    title: string;
+    url: string;
+    description: string;
+    folder_id: number;
+    created_at: string;
+    updated_at: string;
+    image_source: string;
+    favorite?: boolean;
+};
+
+// export const getStaticPaths = (async () => {
+//     const { data } = await axiosInstance.get<{ data: Folder[] }>("users/1/folders");
+
+//     const paths = data.data
+//         .map((folder) => folder.id.toString())
+//         .map((m) => ({ params: { folderId: [m] } }));
+
+//     return {
+//         paths,
+//         fallback: true, // false or "blocking"
+//     };
+// }) satisfies GetStaticPaths;
+
+// export const getStaticProps = (async (context) => {
+//     const folderId = context.params?.folderId?.[0];
+//     const apiPath = !!folderId ? `users/1/links?folderId=${folderId}` : "users/1/links";
+//     const { data } = await axiosInstance.get<{ data: Link[] }>(apiPath);
+
+//     console.log(data);
+
+//     return {
+//         props: {
+//             links: data.data,
+//         },
+//     };
+// }) satisfies GetStaticProps<any>;
+
+export type FolderPageProps = {
+    links: MappedLink[];
+    folders: Folder[];
+};
+
+const FolderPage: NextPage<FolderPageProps> = (props) => {
     const [currentCategory, setCurrentCategory] = useState("전체");
     const [folderId, setFolderId] = useState("0");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,9 +85,8 @@ const FolderPage: React.FC = () => {
     const footerRef = useRef(null);
     const isAddLinkFixed = !isAddLinkShown && !isFooterShown;
 
-    const { data: folders } = useGetLink();
-    const { linkData } = useGetFolderByLink(folderId);
-    const links = linkData?.data;
+    const links = props.links;
+    const folders = props.folders;
 
     const linkDataWithAll = Array.isArray(folders) ? [{ name: "전체", id: "0" }, ...folders] : [];
     const navFixed = true;
