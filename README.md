@@ -11,6 +11,10 @@ git checkout getServerSideProps (SSR)
 git checkout getStaticPath (SSG)
 ```
 
+## Data Fetching 확인 방법
+
+-   pages/optional-catch/[[...folderId]].tsx Data Fetching 방식에 따른 다른 함수를 확인할 수 있습니다.
+
 ## 리팩토링 한 지점
 
 -   src/ui/Category.tsx
